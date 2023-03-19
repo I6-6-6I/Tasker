@@ -1,0 +1,38 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tasker</title>
+
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'fonts/fontello-b79ed67d/css/fontello.css' %}">
+</head>
+
+<body>
+    <h1 class="Title">Tasker</h1>
+    <form class="editForm" action="/updatetaskdata/{{ task.id }}" method="post">
+            {% csrf_token %}
+            <label>Task Title</label><br>
+            <input type="text" name="title" value="{{ task.title }}" placeholder="Enter TaskTitle..." required><br>
+            <label>Task Description</label><br>
+            <textarea name="description" cols="40" rows="10" placeholder="Enter Description..." required>{{ task.description }}</textarea><br>
+            <label>Task Worker</label><br>
+            <select name="workers" required>
+                {% for worker in workers %}
+                {% if worker == task.worker %}
+                <option value="{{ worker.id }}" selected="selected">{{ worker }}</option>
+                {% else %}
+                <option value="{{ worker.id }}">{{ worker }}</option>
+                {% endif %}
+                {% endfor %}
+            </select><br>
+
+            <button class="EditTask" type="submit">Edit</button>
+    </form>
+</body>
+
+</html>

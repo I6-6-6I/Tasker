@@ -1,0 +1,87 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tasker</title>
+
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'fonts/fontello-b79ed67d/css/fontello.css' %}">
+</head>
+
+<body>
+    <h1 class="Title">Tasker</h1>
+    <form action="/addworker" method="post">
+            {% csrf_token %}
+            <h2>New Worker:</h2><input type="text" name="workername" placeholder="Enter Name..." required>
+            <button class="AddWorker" type="submit">Add</button>
+    </form>
+    <div class="WorkersContainer">
+    {% for worker in workers %}
+    <div class="WorkerContainer">
+        {% if worker.name|length > 16 %}
+        <h1 class="Worker">
+            {% for char in worker.name %}{% if forloop.counter < 16 %}{{ char }}{% elif forloop.counter == 16 %}{{ '...' }}{% endif %}{% endfor %}
+            <a class="DeleteWorker" href="/deleteworker/{{ worker.id }}"><i class="icon-trash"></i></a>
+        </h1>
+        {% else %}
+        <h1 class="Worker">{{ worker.name }}
+            <a class="DeleteWorker" href="/deleteworker/{{ worker.id }}"><i class="icon-trash"></i></a>
+        </h1>
+        {% endif %}
+        <form action="/add" method="post">
+            {% csrf_token %}
+            <div class="field">
+                <label>Task Title</label><br>
+                <input type="text" name="title" placeholder="Enter Task..." required><br>
+                <label>Task Description</label><br>
+                <textarea name="description" cols="40" rows="10" placeholder="Enter Description..." required></textarea>
+                <input type="text" class="Invisible" name="worker_id" value="{{ worker.id }}" readonly>
+            </div>
+            <button class="Add" type="submit">Add</button>
+        </form>
+
+        <hr>
+    <div class="TasksContainer">
+        {% for task in tasks %}
+        {% if task.worker == worker %}
+        <div class="task">
+            {% if task.title|length > 16 %}
+            <span class="TaskTitle">
+                {% for char in task.title %}{% if forloop.counter < 16 %}{{ char }}{% elif forloop.counter == 16 %}{{ '...' }}{% endif %}{% endfor %}
+            </span>
+            {% else %}
+            <span class="TaskTitle">{{ task.title }}</span>
+            {% endif %}
+            <a class="Delete" href="/delete/{{ task.id }}"><i class="icon-trash"></i></a>
+            <a class="Edit" href="/edit/{{ task.id }}"><i class="icon-cog"></i></a>
+            <a class="NextStatus" href="/update/{{ task.id }}"><i class="icon-arrow-combo"></i></a>
+            {% if task.status == 'TODO' %}
+            <span class="GrayLabel">TODO</span>
+            {% elif task.status == 'In Progress' %}
+            <span class="YellowLabel">InProgress</span>
+            {% elif task.status == 'Make It In Feature' %}
+            <span class="BlueLabel">Make It In Feature</span>
+            {% else %}
+            <span class="GreenLabel">Done</span>
+            {% endif %}
+        </div>
+        {% if task.description|length > 512 %}
+        <span class="Description">
+            {% for char in task.description %}{% if forloop.counter < 512 %}{{ char }}{% elif forloop.counter == 512 %}{{ '...' }}{% endif %}{% endfor %}
+        </span>
+        {% else %}
+        <span class="Description">{{ task.description }}</span>
+        {% endif %}
+        {% endif %}
+        {% endfor %}
+    </div>
+    </div>
+    {% endfor %}
+    </div>
+</body>
+
+</html>
